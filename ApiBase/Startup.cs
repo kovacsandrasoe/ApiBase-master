@@ -118,9 +118,10 @@ namespace ApiBase
             app.UseAuthorization();
 
             app.UseCors(x => x
-              .AllowAnyOrigin()
+              .AllowCredentials()
               .AllowAnyMethod()
-              .AllowAnyHeader());
+              .AllowAnyHeader()
+              .WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints =>
             {

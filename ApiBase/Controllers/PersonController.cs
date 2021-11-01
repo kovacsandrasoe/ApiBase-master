@@ -31,14 +31,14 @@ namespace ApiBase.Controllers
             _hub = hub;
         }
 
-        
+
         [HttpGet]
         public JsonResult GetPersons()
         {
             return new JsonResult(_database.People);
         }
 
-        
+
         [HttpPost]
         public async Task<JsonResult> CreatePerson([FromBody] Person person)
         {
@@ -48,6 +48,18 @@ namespace ApiBase.Controllers
             await _hub.Clients.All.SendAsync("PersonAdded", person);
 
             return new JsonResult(_database.People.FirstOrDefault(t => t.Id == person.Id));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<JsonResult> DeletePerson(int id)
+        {
+            var personToDelete = _database.People.FirstOrDefault(t => t.Id == id);
+            _database.People.Remove(personToDelete);
+            _database.SaveChanges();
+
+            await _hub.Clients.All.SendAsync("PersonDeleted", personToDelete);
+
+            return new JsonResult(Ok());
         }
 
     }
