@@ -50,6 +50,22 @@ namespace ApiBase.Controllers
             return new JsonResult(_database.People.FirstOrDefault(t => t.Id == person.Id));
         }
 
+        [HttpPut]
+        public async Task<JsonResult> UpdatePerson([FromBody] Person person)
+        {
+            var personToUpdate = _database.People.FirstOrDefault(t => t.Id == person.Id);
+
+            personToUpdate.Name = person.Name;
+            personToUpdate.Age = person.Age;
+            personToUpdate.Job = person.Job;
+            
+            _database.SaveChanges();
+
+            await _hub.Clients.All.SendAsync("PersonUpdated", personToUpdate);
+
+            return new JsonResult(Ok());
+        }
+
         [HttpDelete("{id}")]
         public async Task<JsonResult> DeletePerson(int id)
         {
